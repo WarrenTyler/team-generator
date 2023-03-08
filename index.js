@@ -10,20 +10,9 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./src/page-template.js");
 const { log } = require("console");
-// const Employee = require("./lib/Employee");
 
-// startProgram();
-
-// async function startProgram() {
-//   const team = [
-//     new Manager("Bob", 1, "bob@bobit.com", 2),
-//     new Intern("Karen", 1, "karen@bobit.com", "Hard Knocks"),
-//     new Engineer("Erin", 1, "erin@bobit.com", "erinTheEngineer"),
-//   ];
-
-//   const htmlDoc = render(team);
-//   await fs.writeFile(outputPath, htmlDoc);
-// }
+// holds all team members
+const team = [];
 
 const employeeInput = [
   {
@@ -69,23 +58,6 @@ const employeeInput = [
   },
 ];
 
-// const managerInput = [
-//   ...employeeInput,
-//   {
-//     type: "input",
-//     name: "office",
-//     message: "Please enter your office number",
-//     validate(value) {
-//       const pass = value.match(/^[1-9][0-9]*$/);
-//       if (pass) {
-//         return true;
-//       }
-
-//       return "Please enter a valid office number";
-//     },
-//   },
-// ];
-
 const menu = {
   type: "list",
   name: "menu",
@@ -106,27 +78,6 @@ const menu = {
     },
   ],
 };
-
-// const managerRole = {
-//   title: "manager",
-//   class: Manager,
-//   questions: [
-//     ...employeeInput,
-//     {
-//       type: "number",
-//       name: "office",
-//       message: "Office number",
-//       validate(value) {
-//         const pass = value > 0;
-//         if (pass) {
-//           return true;
-//         }
-
-//         return "Please enter a valid office number";
-//       },
-//     },
-//   ],
-// };
 
 const employeeRoles = {
   manager: {
@@ -151,15 +102,15 @@ const employeeRoles = {
   },
 };
 
-// startProgram();
-const employees = [];
-createEmployee(employeeRoles.manager);
+
+// createEmployee(employeeRoles.manager);
+startProgram();
 
 async function startProgram() {
-  // const team = await createEmployee(employeeRoles.manager);
+  await createEmployee(employeeRoles.manager);
 
-  console.log("team");
-  console.log(employees);
+  // console.log("team");
+  console.log(team);
 
   // const htmlDoc = render(team);
   // await fs.writeFile(outputPath, htmlDoc);
@@ -173,49 +124,13 @@ async function createEmployee(role) {
   questions.push(menu);
 
   console.log(`Please enter ${role.title}'s:`);
-  inquirer.prompt(questions).then((answers) => {
+  await inquirer.prompt(questions).then(async (answers) => {
     const { menu, ...employeeProps } = answers;
 
+    team.push(new role.class(...Object.values(employeeProps)));
+
     if (menu !== "finish") {
-      employees.push(new role.class(...Object.values(employeeProps)));
-      createEmployee(employeeRoles["manager"]);
-    }
-    else {
-      console.log(employees);
+      await createEmployee(employeeRoles["manager"]);
     }
   });
 }
-
-const output = [];
-
-const questions = [
-  {
-    type: "input",
-    name: "comments",
-    message: "Any comments on your purchase experience?",
-    default: "Nope, all good!",
-  },
-  {
-    type: "list",
-    name: "prize",
-    message: "For leaving a comment, you get a freebie",
-    choices: ["cake", "fries"],
-    when(answers) {
-      return answers.comments !== "Nope, all good!";
-    },
-  },
-];
-
-function ask(emp) {
-  inquirer.prompt(emp).then((answers) => {
-    output.push(answers);
-    if (answers.askAgain) {
-      ask(questions);
-    } else {
-      console.log("Your favorite TV Shows:", output.join(", "));
-      console.log(answers);
-    }
-  });
-}
-
-// ask(questions);
