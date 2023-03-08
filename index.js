@@ -107,42 +107,82 @@ const menu = {
   ],
 };
 
-const managerRole = {
-  title: "manager",
-  class: Manager,
-  questions: [
-    ...employeeInput,
-    {
-      type: "number",
-      name: "office",
-      message: "Office number",
-      validate(value) {
-        const pass = value > 0;
-        if (pass) {
-          return true;
-        }
-        
-        return "Please enter a valid office number";
+// const managerRole = {
+//   title: "manager",
+//   class: Manager,
+//   questions: [
+//     ...employeeInput,
+//     {
+//       type: "number",
+//       name: "office",
+//       message: "Office number",
+//       validate(value) {
+//         const pass = value > 0;
+//         if (pass) {
+//           return true;
+//         }
+
+//         return "Please enter a valid office number";
+//       },
+//     },
+//   ],
+// };
+
+const employeeRoles = {
+  manager: {
+    title: "manager",
+    class: Manager,
+    questions: [
+      ...employeeInput,
+      {
+        type: "number",
+        name: "office",
+        message: "Office number",
+        validate(value) {
+          const pass = value > 0;
+          if (pass) {
+            return true;
+          }
+
+          return "Please enter a valid office number";
+        },
       },
-    },
-    menu,
-  ],
+    ],
+  },
 };
 
+// startProgram();
+const employees = [];
+createEmployee(employeeRoles.manager);
 
-// inquirer.prompt(managerRole.questions).then((answers) => {
-//   console.log(JSON.stringify(answers, null, "  "));
-//   console.log(new managerRole.class("Foo", 1, "test@test.com", 100));
-// });
-console.log("Please enter team manager's:");
+async function startProgram() {
+  // const team = await createEmployee(employeeRoles.manager);
 
-createEmployee(managerRole);
+  console.log("team");
+  console.log(employees);
 
-function createEmployee(role) {
+  // const htmlDoc = render(team);
+  // await fs.writeFile(outputPath, htmlDoc);
+}
+
+// const employees = createEmployee(employeeRoles.manager);
+// console.log(employees.length);
+
+async function createEmployee(role) {
   const questions = role.questions;
+  questions.push(menu);
+
+  console.log(`Please enter ${role.title}'s:`);
   inquirer.prompt(questions).then((answers) => {
-    console.log(JSON.stringify(answers, null, "  "));
-    console.log(new managerRole.class("Foo", 1, "test@test.com", 100));
+    const { menu, ...employeeProps } = answers;
+
+    if (menu !== "finish") {
+      employees.push(new role.class(...Object.values(employeeProps)));
+      createEmployee(employeeRoles["manager"]);
+    }
+    else {
+      console.log(employees);
+    }
   });
 }
 
