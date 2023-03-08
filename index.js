@@ -12,65 +12,62 @@ const render = require("./src/page-template.js");
 const { log } = require("console");
 // const Employee = require("./lib/Employee");
 
-// TODO: Write Code to gather information about the development team members, and render the HTML file.
-startProgram();
+// startProgram();
 
-async function startProgram() {
-  const team = [
-    new Manager("Bob", 1, "bob@bobit.com", 2),
-    new Intern("Karen", 1, "karen@bobit.com", "Hard Knocks"),
-    new Engineer("Erin", 1, "erin@bobit.com", "erinTheEngineer"),
-  ];
+// async function startProgram() {
+//   const team = [
+//     new Manager("Bob", 1, "bob@bobit.com", 2),
+//     new Intern("Karen", 1, "karen@bobit.com", "Hard Knocks"),
+//     new Engineer("Erin", 1, "erin@bobit.com", "erinTheEngineer"),
+//   ];
 
-  const htmlDoc = render(team);
-  await fs.writeFile(outputPath, htmlDoc);
-}
+//   const htmlDoc = render(team);
+//   await fs.writeFile(outputPath, htmlDoc);
+// }
 
+const employeeInput = [
+  {
+    type: "input",
+    name: "name",
+    message: "Name",
+    validate(value) {
+      const pass = value.match(/^([a-z]+[,.]?[ ]?|[a-z]+['-]?)+$/);
+      if (pass) {
+        return true;
+      }
 
+      return "Please enter a valid name";
+    },
+  },
+  {
+    type: "number",
+    name: "id",
+    message: "Employee ID",
+    validate(value) {
+      const pass = value > 0;
+      if (pass) {
+        return true;
+      }
 
-// const employeeInput = [
-//   {
-//     type: "input",
-//     name: "name",
-//     message: "Please enter your name",
-//     validate(value) {
-//       const pass = value.match(/^([a-z]+[,.]?[ ]?|[a-z]+['-]?)+$/);
-//       if (pass) {
-//         return true;
-//       }
+      return "Please enter a valid office number";
+    },
+  },
+  {
+    type: "input",
+    name: "email",
+    message: "Email",
+    validate(value) {
+      const pass = value.match(
+        /^[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*@[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*(\.[a-zA-Z]{2,4})$/
+      );
+      if (pass) {
+        return true;
+      }
 
-//       return "Please enter a valid name";
-//     },
-//   },
-//   {
-//     type: "input",
-//     name: "id",
-//     message: "Please enter your ID",
-//     validate(value) {
-//       const pass = value.match(/^[1-9][0-9]*$/);
-//       if (pass) {
-//         return true;
-//       }
-
-//       return "Please enter a valid office number";
-//     },
-//   },
-//   {
-//     type: "input",
-//     name: "email",
-//     message: "Please enter your email",
-//     validate(value) {
-//       const pass = value.match(
-//         /^[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*@[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*(\.[a-zA-Z]{2,4})$/
-//       );
-//       if (pass) {
-//         return true;
-//       }
-
-//       return "Please enter a valid email";
-//     },
-//   },
-// ];
+      return "Please enter a valid email";
+    },
+  },
+];
 
 // const managerInput = [
 //   ...employeeInput,
@@ -89,62 +86,65 @@ async function startProgram() {
 //   },
 // ];
 
-function employee({role}) {
-  return [
-    // {prefix: "Hello "},
-    // {
-    //   type: "input",
-    //   name: "role",
-    //   message: "Role",
-    // },
+const menu = {
+  type: "list",
+  name: "menu",
+  message: "What do you want to do?",
+  choices: [
     {
-      prefix: `Enter ${role}\n`,
-      type: "input",
-      name: "name",
-      message: "Please enter your name",
-      validate(value) {
-        const pass = value.match(/^([a-z]+[,.]?[ ]?|[a-z]+['-]?)+$/);
-        if (pass) {
-          return true;
-        }
-
-        return "Please enter a valid name";
-      },
+      name: "Add an engineer",
+      value: "engineer",
     },
     {
-      type: "input",
-      name: "id",
-      message: "Please enter your ID",
+      name: "Add an intern",
+      value: "intern",
+    },
+    new inquirer.Separator(),
+    {
+      name: "Finish building the team",
+      value: "finish",
+    },
+  ],
+};
+
+const managerRole = {
+  title: "manager",
+  class: Manager,
+  questions: [
+    ...employeeInput,
+    {
+      type: "number",
+      name: "office",
+      message: "Office number",
       validate(value) {
-        const pass = value.match(/^[1-9][0-9]*$/);
+        const pass = value > 0;
         if (pass) {
           return true;
         }
-
+        
         return "Please enter a valid office number";
       },
     },
-    {
-      type: "input",
-      name: "email",
-      message: "Please enter your email",
-      validate(value) {
-        const pass = value.match(
-          /^[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*@[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*(\.[a-zA-Z]{2,4})$/
-        );
-        if (pass) {
-          return true;
-        }
+    menu,
+  ],
+};
 
-        return "Please enter a valid email";
-      },
-    },
-  ];
+
+// inquirer.prompt(managerRole.questions).then((answers) => {
+//   console.log(JSON.stringify(answers, null, "  "));
+//   console.log(new managerRole.class("Foo", 1, "test@test.com", 100));
+// });
+console.log("Please enter team manager's:");
+
+createEmployee(managerRole);
+
+function createEmployee(role) {
+  const questions = role.questions;
+  inquirer.prompt(questions).then((answers) => {
+    console.log(JSON.stringify(answers, null, "  "));
+    console.log(new managerRole.class("Foo", 1, "test@test.com", 100));
+  });
 }
-const ans = { role: "manager", hello: "hello"}
-inquirer.prompt(employee(ans), {ans}).then((answers) => {
-  console.log(JSON.stringify(answers, null, "  "));
-});
 
 const output = [];
 
@@ -165,19 +165,6 @@ const questions = [
     },
   },
 ];
-// const questions = [
-//   {
-//     type: 'input',
-//     name: 'tvShow',
-//     message: "What's your favorite TV show?",
-//   },
-//   {
-//     type: 'confirm',
-//     name: 'askAgain',
-//     message: 'Want to enter another TV show favorite (just hit enter for YES)?',
-//     default: true,
-//   },
-// ];
 
 function ask(emp) {
   inquirer.prompt(emp).then((answers) => {
