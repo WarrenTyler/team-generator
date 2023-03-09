@@ -14,6 +14,12 @@ const { log } = require("console");
 // holds all team members
 const team = [];
 
+const filterNumberInput = {
+  filter(value) {
+    return Number.isInteger(value) && value > 0 ? Number(value) : "";
+  },
+};
+
 const employeeInput = [
   {
     type: "input",
@@ -33,13 +39,14 @@ const employeeInput = [
     name: "id",
     message: "Employee ID",
     validate(value) {
-      const pass = value > 0;
+      const pass = Number.isInteger(value) && value > 0;
       if (pass) {
         return true;
       }
 
-      return "Please enter a valid office number";
+      return "Please enter a valid Employee ID";
     },
+    ...filterNumberInput,
   },
   {
     type: "input",
@@ -90,13 +97,14 @@ const employeeRoles = {
         name: "office",
         message: "Office number",
         validate(value) {
-          const pass = value > 0;
+          const pass = Number.isInteger(value) && value > 0;
           if (pass) {
             return true;
           }
 
           return "Please enter a valid office number";
         },
+        ...filterNumberInput,
       },
     ],
   },
@@ -110,11 +118,11 @@ const employeeRoles = {
         name: "username",
         message: "GitHub username",
         validate(value) {
-          const pass = value.match(/^([a-z]+[,.]?[ ]?|[a-z]+['-]?)+$/);
+          const pass = value.match(/^([a-z\d]+-)*[a-z\d]+$/i);
           if (pass) {
             return true;
           }
-    
+
           return "Please enter a valid GitHub username";
         },
       },
@@ -142,8 +150,6 @@ const employeeRoles = {
   },
 };
 
-
-// createEmployee(employeeRoles.manager);
 startProgram();
 
 async function startProgram() {
