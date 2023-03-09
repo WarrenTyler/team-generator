@@ -11,9 +11,6 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 const render = require("./src/page-template.js");
 const { log } = require("console");
 
-// holds all team members
-const team = [];
-
 const filterNumberInput = {
   filter(value) {
     return Number.isInteger(value) && value > 0 ? Number(value) : "";
@@ -26,7 +23,7 @@ const employeeInput = [
     name: "name",
     message: "Name",
     validate(value) {
-      const pass = value.match(/^([a-z]+[,.]?[ ]?|[a-z]+['-]?)+$/);
+      const pass = value.match(/^[A-Z][a-z]*(([,.] |[ '-])[A-Za-z][a-z]*)*(\.?)$/);
       if (pass) {
         return true;
       }
@@ -150,20 +147,19 @@ const employeeRoles = {
   },
 };
 
+// holds all team members created from inquirer
+const team = [];
+
 startProgram();
 
 async function startProgram() {
   await createEmployee(employeeRoles.manager);
 
-  // console.log("team");
   console.log(team);
 
-  // const htmlDoc = render(team);
-  // await fs.writeFile(outputPath, htmlDoc);
+  const htmlDoc = render(team);
+  await fs.writeFile(outputPath, htmlDoc);
 }
-
-// const employees = createEmployee(employeeRoles.manager);
-// console.log(employees.length);
 
 async function createEmployee(role) {
   const questions = role.questions;
