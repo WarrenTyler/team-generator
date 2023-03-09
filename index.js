@@ -100,6 +100,46 @@ const employeeRoles = {
       },
     ],
   },
+  engineer: {
+    title: "engineer",
+    class: Engineer,
+    questions: [
+      ...employeeInput,
+      {
+        type: "input",
+        name: "username",
+        message: "GitHub username",
+        validate(value) {
+          const pass = value.match(/^([a-z]+[,.]?[ ]?|[a-z]+['-]?)+$/);
+          if (pass) {
+            return true;
+          }
+    
+          return "Please enter a valid GitHub username";
+        },
+      },
+    ],
+  },
+  intern: {
+    title: "intern",
+    class: Intern,
+    questions: [
+      ...employeeInput,
+      {
+        type: "input",
+        name: "school",
+        message: "School",
+        validate(value) {
+          const pass = value !== "";
+          if (pass) {
+            return true;
+          }
+
+          return "Please enter a school";
+        },
+      },
+    ],
+  },
 };
 
 
@@ -130,7 +170,7 @@ async function createEmployee(role) {
     team.push(new role.class(...Object.values(employeeProps)));
 
     if (menu !== "finish") {
-      await createEmployee(employeeRoles["manager"]);
+      await createEmployee(employeeRoles[menu]);
     }
   });
 }
