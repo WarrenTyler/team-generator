@@ -135,12 +135,13 @@ const employeeRoles = {
         name: "school",
         message: "School",
         validate(value) {
-          const pass = value !== "";
+          const pass = value.match(/^[A-Z][a-z]*(([,.] |[ '-])[A-Za-z][a-z]*)*(\.?)$/);
+
           if (pass) {
             return true;
           }
 
-          return "Please enter a school";
+          return "Please enter a school name";
         },
       },
     ],
