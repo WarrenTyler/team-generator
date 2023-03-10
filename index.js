@@ -5,18 +5,21 @@ const inquirer = require("inquirer");
 const path = require("path");
 const fs = require("fs/promises");
 
+// the output directory and path
 const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./src/page-template.js");
 const { log } = require("console");
 
+// used to clear inquirer input field after bad input on number types in inquirer
 const filterNumberInput = {
   filter(value) {
     return Number.isInteger(value) && value > 0 ? Number(value) : "";
   },
 };
 
+// the generic input for all employees, for inquirer
 const employeeInput = [
   {
     type: "input",
@@ -62,6 +65,7 @@ const employeeInput = [
   },
 ];
 
+// the menu input for all employees, for inquirer
 const menu = {
   type: "list",
   name: "menu",
@@ -83,6 +87,7 @@ const menu = {
   ],
 };
 
+// contains specialization for the types of employees, for inquirer
 const employeeRoles = {
   manager: {
     title: "manager",
@@ -153,25 +158,36 @@ const team = [];
 startProgram();
 
 async function startProgram() {
+  // get and wait for the user to input all employees in the team,
+  // starting with the manager
   await createEmployee(employeeRoles.manager);
 
-  console.log(team);
-
+  // when the team is complete, write to and wait for the file to be written
   const htmlDoc = render(team);
   await fs.writeFile(outputPath, htmlDoc);
+
+  console.log("Success!");
 }
 
 async function createEmployee(role) {
+  // get the questions for the specific type of employee
   const questions = role.questions;
+  // add the menu to the end
   questions.push(menu);
 
   console.log(`Please enter ${role.title}'s:`);
+  // wait for the user to input all questions
   await inquirer.prompt(questions).then(async (answers) => {
     const { menu, ...employeeProps } = answers;
 
+    // create a new instance of the required employee,
+    // and add that to the team array
     team.push(new role.class(...Object.values(employeeProps)));
 
     if (menu !== "finish") {
+      // if the user chooses to add another employee,
+      // use a recusive call to get and wait for the user
+      // to input the employee in inquirer
       await createEmployee(employeeRoles[menu]);
     }
   });
